@@ -1,0 +1,98 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<br><br><br>
+
+<style>
+    /* Background styling */
+    body {
+        background: linear-gradient(to right, #ff7e5f, #feb47b);
+        color: #333;
+    }
+
+    /* General container styling */
+    .site-section {
+        padding: 3rem 0;
+    }
+
+    /* Button styles */
+    .btn-primary, .btn-secondary {
+        border: none;
+        font-size: 1.1rem;
+        padding: 12px 25px;
+        border-radius: 30px;
+        box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #ff5a36;
+        color: #fff;
+        transform: scale(1.05);
+    }
+
+    .btn-secondary:hover {
+        background-color: #feb47b;
+        color: #fff;
+        transform: scale(1.05);
+    }
+
+    /* Image styling */
+    .slide-one-item img {
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease;
+    }
+
+    .slide-one-item img:hover {
+        transform: scale(1.02);
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .container {
+            padding: 0 1rem;
+        }
+
+        .btn-primary, .btn-secondary {
+            font-size: 1rem;
+            padding: 10px 20px;
+            width: 100%; /* Full width buttons on small screens */
+            margin-bottom: 15px; /* Space between buttons on mobile */
+        }
+
+        /* Center elements on smaller screens */
+        .text-center {
+            text-align: center;
+        }
+    }
+</style>
+
+<section class="site-section" id="about-section">
+    <div class="container">
+        <div class="row large-gutters align-items-center">
+            <!-- Staff Section -->
+            <div class="col-lg-6 mb-5">
+                <div class="owl-carousel slide-one-item with-dots">
+                    <a href="{% url 'owner_dashboard' %}"><div><img src="{% static 'images/staff.jpg' %}" alt="fresh rak" class="img-fluid"></div></a>
+                </div>
+                <div class="text-center mt-4">
+                    <a href="{% url 'owner_dashboard' %}" class="btn btn-primary">Staff details</a>
+                </div>
+            </div>
+
+            <!-- Product Section -->
+            <div class="col-lg-6 mb-5">
+                <div class="owl-carousel slide-one-item with-dots">
+                    <a href="{% url 'product_list' %}"><div><img src="{% static 'images/product.jpg' %}" alt="fresh rak" class="img-fluid"></div></a>
+                </div>
+                <div class="text-center mt-4">
+                    <a href="{% url 'product_list' %}" class="btn btn-secondary">Product details</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

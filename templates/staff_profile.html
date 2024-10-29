@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Login &mdash; Freshrak{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        height: 100vh; /* Full height of the viewport */
+        margin: 0; /* Remove default margin */
+        background: linear-gradient(to right, #ff7e5f, #feb47b); /* Change the colors as needed */
+    }
+
+    .content-container {
+        position: relative; /* To allow positioning of inner elements if needed */
+        z-index: 1; /* Ensures content appears above the background */
+        backdrop-filter: blur(10px); /* Apply blur effect */
+        background: rgba(255, 255, 255, 0.2); /* Light white background with some transparency */
+        border-radius: 15px; /* Round the corners */
+        padding: 20px; /* Add some padding */
+        margin: 20px; /* Add margin to separate from the edges */
+    }
+
+    h2 {
+        color: #fff; /* Change header color for better visibility */
+    }
+
+    .btn-primary {
+        background-color: #007bff; /* Button color */
+        border: none; /* Remove border */
+    }
+
+    .btn-logout {
+        background-color: #dc3545; /* Red button for logout */
+        border: none; /* Remove border */
+        color: white; /* White text */
+    }
+
+    .btn-check {
+        background-color: #28a745; /* Green button for check-in/out */
+        border: none; /* Remove border */
+        color: white; /* White text */
+    }
+
+    /* Optional: Add some styles for your form inputs */
+    input[type="text"], input[type="password"], textarea {
+        background: rgba(255, 255, 255, 0.3); /* Input background with transparency */
+        border: none; /* Remove border */
+        border-radius: 5px; /* Round corners */
+        padding: 10px; /* Add some padding */
+        width: 100%; /* Full width */
+        margin-bottom: 10px; /* Space between inputs */
+    }
+</style>
+
+<br><br><br>
+
+<div class="content-container">
+    <h1 class="mt-5">{{ staff.full_name }}'s Profile</h1>
+    
+    <div class="mb-4">
+        <!-- Debugging: Print the image URL -->
+        <p>Profile Picture URL: {{ staff.profile_picture.url }}</p>
+    
+        <img src="{{ staff.profile_picture.url|default:'/static/default_profile.png' }}" 
+        alt="Profile Picture" 
+        style="max-width: 150px; /* Adjust this value as needed */ 
+               height: auto; /* Maintain aspect ratio */ 
+               border-radius: 0%; /* Optional: to make it circular */" 
+   >
+    </div>
+   
+    <!-- Check-In and Check-Out Buttons -->
+    <!-- Check-In Button -->
+    {% if attendance.check_in_time %}
+        <button class="btn btn-check" disabled>Checked In at {{ attendance.check_in_time|date:"H:i:s" }}</button>
+    {% else %}
+        <form method="POST" action="{% url 'check_in_view' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-check">Check In</button>
+        </form>
+    {% endif %}
+    
+    <!-- Check-Out Button -->
+    {% if attendance.check_out_time %}
+        <button class="btn btn-check" disabled>Checked Out at {{ attendance.check_out_time|date:"H:i:s" }}</button>
+    {% elif attendance.check_in_time %}
+        <form method="POST" action="{% url 'check_out_view' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-check">Check Out</button>
+        </form>
+    {% else %}
+        <button class="btn btn-check" disabled>Please Check In First</button>
+    {% endif %}
+
+    <h2>Today's Tasks</h2>
+    {% if todays_tasks %}
+        {% for task in todays_tasks %}
+            <div class="mb-3 border rounded p-3" style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(5px);">
+                <p><strong>Task:</strong> {{ task.task_name }}</p>
+                <p><strong>Scheduled Date:</strong> {{ task.scheduled_date }}</p>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="task_id" value="{{ task.id }}">
+                    <label for="completed">Mark as Complete</label>
+                    <input type="checkbox" name="completed" value="True" {% if task.completed %} checked {% endif %}>
+
+                    <label for="note">Note:</label>
+                    <textarea name="note" class="form-control">{{ task.note }}</textarea>
+
+                    <button type="submit" class="btn btn-primary mt-2">Update</button>
+                </form>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No tasks assigned for today.</p>
+    {% endif %}
+
+    <h2>Scheduled Tasks</h2>
+    {% if scheduled_tasks %}
+        {% for task in scheduled_tasks %}
+            <div class="mb-3 border rounded p-3" style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(5px);">
+                <p><strong>Task:</strong> {{ task.task_name }}</p>
+                <p><strong>Scheduled Date:</strong> {{ task.scheduled_date }}</p>
+                <p><strong>Status:</strong> {% if task.completed %} Completed {% else %} Not Completed {% endif %}</p>
+                <p><strong>Note:</strong> {{ task.note }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No upcoming tasks scheduled.</p>
+    {% endif %}
+
+    <ul class="list-group mb-4">
+        <li class="list-group-item"><strong>Contact Number:</strong> {{ staff.contact_number }}</li>
+        <li class="list-group-item"><strong>Address:</strong> {{ staff.address }}</li>
+        <li class="list-group-item"><strong>Passport Number:</strong> {{ staff.passport_number }}</li>
+        <li class="list-group-item"><strong>Visa Status:</strong> {{ staff.visa_status }}</li>
+        <li class="list-group-item"><strong>Visa Expiry Date:</strong> {{ staff.visa_expiry_date }}</li>
+    </ul>
+    <form method="POST" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-logout mt-2">Logout</button>
+    </form>
+</div>
+
+{% endblock %}
