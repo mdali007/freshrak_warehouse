@@ -39,41 +39,37 @@ def staff_profile_view(request):
 
 
 @login_required
-def check_in_view(request):
+def attendance_view(request):
     staff = Staff.objects.get(user=request.user)
-
-    # Check if the staff member has already checked in today
     today = timezone.now().date()
+    # Fetch or create the attendance record for today
     attendance, created = Attendance.objects.get_or_create(staff=staff, date=today)
 
-    if request.method == 'POST' and not attendance.check_in_time:
-        # Only update check-in if it hasn't been set
-        attendance.check_in_time = timezone.now()
-        attendance.save()
-        return redirect('staff_profile')
+    if request.method == 'POST':
+        # If Check-In button was clicked and check-in time isn't already set
+        if 'check_in' in request.POST and not attendance.check_in_time:
+            attendance.check_in_time = timezone.now()
+            attendance.save()
+            return redirect('staff_profile')  # Reload to reflect new state
 
+        # If Check-Out button was clicked and check-in time is set but check-out time is not
+        elif 'check_out' in request.POST and attendance.check_in_time and not attendance.check_out_time:
+            attendance.check_out_time = timezone.now()
+            attendance.save()
+            return redirect('staff_profile')  # Reload to reflect new state
+
+    # Pass the updated attendance data to template after any action
     return render(request, 'staff_profile.html', {'staff': staff, 'attendance': attendance})
 
-
-@login_required
-def check_out_view(request):
-    staff = Staff.objects.get(user=request.user)
-
-    # Check if the staff member has checked in today
-    today = timezone.now().date()
-    attendance = get_object_or_404(Attendance, staff=staff, date=today)
-
-    if request.method == 'POST' and attendance.check_in_time and not attendance.check_out_time:
-        # Only update check-out if it hasn't been set
-        attendance.check_out_time = timezone.now()
-        attendance.save()
-        return redirect('staff_profile')
-
-    return render(request, 'staff_profile.html', {'staff': staff, 'attendance': attendance})
 
 
 
 # Owner view - Can view all staff profiles and assign tasks
+from django.shortcuts import render, get_object_or_404
+from django.utils import timezone
+from django.contrib.auth.decorators import login_required, user_passes_test
+from .models import Staff, Task, Attendance
+
 @login_required
 @user_passes_test(lambda u: u.groups.filter(name='Owner').exists())
 def owner_dashboard_view(request):
@@ -83,6 +79,24 @@ def owner_dashboard_view(request):
     # Fetch attendance records for today
     today = timezone.now().date()
     attendance_records = Attendance.objects.filter(date=today)
+    
+    # Dictionary to hold each staff's attendance status
+    attendance_data = []
+
+    for staff in all_staff:
+        # Check if the staff has an attendance entry for today
+        attendance = attendance_records.filter(staff=staff).first()
+        if attendance:
+            status = "Present" if attendance.check_in_time else "Absent (No Check-In)"
+        else:
+            status = "Absent"
+        
+        attendance_data.append({
+            'staff': staff,
+            'status': status,
+            'check_in_time': getattr(attendance, 'check_in_time', None),
+            'check_out_time': getattr(attendance, 'check_out_time', None),
+        })
 
     if request.method == 'POST':
         task_description = request.POST.get('task_description')
@@ -100,8 +114,9 @@ def owner_dashboard_view(request):
     return render(request, 'owner_dashboard.html', {
         'all_staff': all_staff, 
         'tasks': tasks,
-        'attendance_records': attendance_records  # Pass attendance records to the template
+        'attendance_data': attendance_data,  # Pass attendance data to the template
     })
+
 
 
 

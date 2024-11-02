@@ -43,5 +43,10 @@ class Attendance(models.Model):
     check_out_time = models.DateTimeField(null=True, blank=True)  # Add check-out time
     is_present = models.BooleanField(default=False)
 
+    def save(self, *args, **kwargs):
+        # Automatically set `is_present` if `check_in_time` is not null
+        self.is_present = bool(self.check_in_time)
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.staff.full_name} - {self.date} - {'Present' if self.is_present else 'Absent'}"

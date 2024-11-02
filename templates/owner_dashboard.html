@@ -7,42 +7,35 @@
 
     <h2>All Staff</h2>
     <div class="row mb-4">
-        {% for staff in all_staff %}
+        {% for entry in attendance_data %}
             <div class="col-lg-6 mb-4">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">{{ staff.full_name }}</h5>
+                        <h5 class="card-title">{{ entry.staff.full_name }}</h5>
                         <div class="mb-4">
-                            <p>Profile Picture URL: {{ staff.profile_picture.url }}</p>
-                            <img src="{{ staff.profile_picture.url|default:'/static/default_profile.png' }}" 
+                            <img src="{{ entry.staff.profile_picture.url|default:'/static/default_profile.png' }}" 
                                  alt="Profile Picture" 
                                  style="max-width: 150px; height: auto; border-radius: 0%;">
                         </div>
-                        <p>Contact: {{ staff.contact_number }}</p>
+                        <p>Contact: {{ entry.staff.contact_number }}</p>
 
                         <!-- Check-In and Check-Out Details -->
                         <div class="attendance-details">
-                            {% for attendance in attendance_records %}
-                                {% if attendance.staff == staff %}
-                                    <p>Check-In Time: {{ attendance.check_in_time|date:"H:i:s" }}</p>
-                                    <p>Check-Out Time: {{ attendance.check_out_time|date:"H:i:s" }}</p>
-                                    <p>Status: {{ attendance.is_present|yesno:"Present,Absent" }}</p>
-                                {% endif %}
-                            {% empty %}
-                                <p>No attendance record for today.</p>
-                            {% endfor %}
+                            <p>Check-In Time: {{ entry.check_in_time|default:"-"|date:"H:i:s" }}</p>
+                            <p>Check-Out Time: {{ entry.check_out_time|default:"-"|date:"H:i:s" }}</p>
+                            <p>Status: {{ entry.status }}</p>
                         </div>
 
                         <!-- Task Toggle Button -->
-                        <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#tasks-{{ staff.id }}" aria-expanded="false" aria-controls="tasks-{{ staff.id }}">
+                        <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#tasks-{{ entry.staff.id }}" aria-expanded="false" aria-controls="tasks-{{ entry.staff.id }}">
                             View Assigned Tasks
                         </button>
                         
                         <!-- Collapsible Task List -->
-                        <div class="collapse" id="tasks-{{ staff.id }}">
+                        <div class="collapse" id="tasks-{{ entry.staff.id }}">
                             <p class="mt-3">Tasks:</p>
                             <ul>
-                                {% for task in staff.task_set.all %}
+                                {% for task in entry.staff.task_set.all %}
                                     <li>
                                         {{ task.task_name }} 
                                         <form method="POST" style="display:inline;">

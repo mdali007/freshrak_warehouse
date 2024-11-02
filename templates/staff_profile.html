@@ -59,7 +59,7 @@
     
     <div class="mb-4">
         <!-- Debugging: Print the image URL -->
-        <p>Profile Picture URL: {{ staff.profile_picture.url }}</p>
+        <!-- <p>Profile Picture URL: {{ staff.profile_picture.url }}</p> -->
     
         <img src="{{ staff.profile_picture.url|default:'/static/default_profile.png' }}" 
         alt="Profile Picture" 
@@ -70,27 +70,40 @@
     </div>
    
     <!-- Check-In and Check-Out Buttons -->
-    <!-- Check-In Button -->
-    {% if attendance.check_in_time %}
-        <button class="btn btn-check" disabled>Checked In at {{ attendance.check_in_time|date:"H:i:s" }}</button>
-    {% else %}
-        <form method="POST" action="{% url 'check_in_view' %}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-check">Check In</button>
-        </form>
-    {% endif %}
-    
-    <!-- Check-Out Button -->
-    {% if attendance.check_out_time %}
-        <button class="btn btn-check" disabled>Checked Out at {{ attendance.check_out_time|date:"H:i:s" }}</button>
-    {% elif attendance.check_in_time %}
-        <form method="POST" action="{% url 'check_out_view' %}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-check">Check Out</button>
-        </form>
-    {% else %}
-        <button class="btn btn-check" disabled>Please Check In First</button>
-    {% endif %}
+<!-- Check-In Button -->
+{% if attendance.check_in_time %}
+    <!-- Disable Check-In button and show check-in time after checking in -->
+    <button class="btn btn-check" disabled>
+        Checked In at {{ attendance.check_in_time|date:"H:i:s" }}
+    </button>
+{% else %}
+    <form method="POST" action="{% url 'attendance_view' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-check" name="check_in">Check In</button>
+    </form>
+{% endif %}
+
+<!-- Check-Out Button -->
+{% if attendance.check_out_time %}
+    <!-- Disable Check-Out button and show check-out time after checking out -->
+    <button class="btn btn-check" disabled>
+        Checked Out at {{ attendance.check_out_time|date:"H:i:s" }}
+    </button>
+{% elif attendance.check_in_time %}
+    <!-- Enable Check-Out button only if Check-In is complete -->
+    <form method="POST" action="{% url 'attendance_view' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-check" name="check_out">Check Out</button>
+    </form>
+{% else %}
+    <!-- If not checked in, disable the Check-Out button -->
+    <button class="btn btn-check" disabled>
+        Please Check In First
+    </button>
+{% endif %}
+
+
+
 
     <h2>Today's Tasks</h2>
     {% if todays_tasks %}
