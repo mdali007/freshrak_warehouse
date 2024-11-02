@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os
 from pathlib import Path
+from django.core.wsgi import get_wsgi_application
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -110,7 +111,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'your_project_name.settings')
 
+application = get_wsgi_application()
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
