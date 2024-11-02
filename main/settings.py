@@ -85,11 +85,11 @@ WSGI_APPLICATION = 'main.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': '5432',  # Default PostgreSQL port
+        'NAME': 'freshrak_db',
+        'USER': 'freshrak_db_user',
+        'PASSWORD': 'NI2RDsfeW0lxxjnGtNHKFXlwCP8vbkMz',
+        'HOST': 'dpg-csj1p3tsvqrc73eluma0-a',  # This could be a URL or an IP
+        'PORT': '5432',  # Default port for PostgreSQL
     }
 }
 
