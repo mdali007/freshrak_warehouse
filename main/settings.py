@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-+cj%^sxi6)zensx^%@j_biquu4-s1h9=wv43n#bve2qw$7ugnz
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['freshrak-warehouse.onrender.com']
+ALLOWED_HOSTS = ['mdali20.pythonanywhere.com']
 
 
 
@@ -84,12 +84,8 @@ WSGI_APPLICATION = 'main.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'freshrak_db',
-        'USER': 'freshrak_db_user',
-        'PASSWORD': 'NI2RDsfeW0lxxjnGtNHKFXlwCP8vbkMz',
-        'HOST': 'dpg-csj1p3tsvqrc73eluma0-a',  # This could be a URL or an IP
-        'PORT': '5432',  # Default port for PostgreSQL
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
